@@ -8,3 +8,8 @@
 - LOS PROBLEMA ocurren cuando tratamos de ejecutarlo para que se muestra en QEMU, el cual no imprime nada.
 - Se intento añadirle el bootloader.asm a la compilacion con Kernel.c, a pesar de eso QEMU solo imprime solo lo implementado en el bootloader.asm, QEMU ignora a kernel.c
 - Se hara mas investigaciones para resolver el problema
+
+### Prueba con Python
+- Debido al inconveniente anterior, se probara avanzar con python
+- Posteriormente deberiamos acoplar qemu de ser posible
+- 
