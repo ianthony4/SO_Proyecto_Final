@@ -32,6 +32,19 @@ void ordenar_por_prioridad(proceso *tabla, int tamano) {
     }
 }
 
+void mostrar_detalles() {
+    char *memoria_video = (char *)0xB8000;
+    int offset = 0;
+
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        const char *estado_actual = tabla_procesos[i].estado;
+        offset += sprintf(memoria_video + offset * 2,
+            "ID: %d, Prioridad: %d, Estado: %s, Restante: %d\n",
+            tabla_procesos[i].id, tabla_procesos[i].prioridad,
+            estado_actual, tabla_procesos[i].tiempo_restante);
+    }
+}
+
 void planificador() {
     ordenar_por_prioridad(tabla_procesos, MAX_PROCESOS); 
     bool todos_terminados = false;
