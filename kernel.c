@@ -1,12 +1,15 @@
-void kernel_main(void) {
-    char *video_memory = (char *)0xB8000; // Dirección de video
-    const char *msg = "Proyecto gamaOS v0.01";
-    
-    for (int i = 0; msg[i] != '\0'; i++) {
-        video_memory[i * 2] = msg[i];      
-        video_memory[i * 2 + 1] = 0x0F;    // Para el color
-    }
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-    while (1); 
-}
+#define MAX_PROCESSES 3
+#define QUANTUM 2
+
+typedef struct {
+    int id;                 
+    int prioridad;          
+    int tiempo_ejecucion;   
+    int tiempo_restante;   
+    char estado[12];        // listo, ejecutando, terminado
+} proceso;
 
