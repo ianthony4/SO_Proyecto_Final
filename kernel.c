@@ -62,3 +62,18 @@ void planificador() {
         }
     }
 }
+
+void kernel_principal(void) {
+   
+    planificador();
+
+    // resultados
+    char *memoria_video = (char *)0xB8000;
+    const char *mensaje = "Prueba con RR acabo";
+    for (int i = 0; mensaje[i] != '\0'; i++) {
+        memoria_video[i * 2] = mensaje[i];
+        memoria_video[i * 2 + 1] = 0x0F;
+    }
+
+    while (1);
+}
