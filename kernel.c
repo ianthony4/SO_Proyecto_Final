@@ -46,7 +46,7 @@ void planificador() {
 
                 // simulacion
                 __builtin_memcpy(tabla_procesos[i].estado, "ejecutando", 11);
-                int tiempo_ejecutado = (tabla_procesos[i].tiempo_restante > CUANTO_TIEMPO) ? CUANTO_TIEMPO : tabla_procesos[i].tiempo_restante;
+                int tiempo_ejecutado = (tabla_procesos[i].tiempo_restante > QUANTUM) ? QUANTUM : tabla_procesos[i].tiempo_restante;
                 tabla_procesos[i].tiempo_restante -= tiempo_ejecutado;
 
                 // simu tiempo de ejecucion (retardo)
@@ -63,7 +63,7 @@ void planificador() {
     }
 }
 
-void kernel_principal(void) {
+void kernel_main(void) {
    
     planificador();
 
