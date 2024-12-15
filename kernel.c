@@ -31,7 +31,8 @@ void ordenar_por_prioridad(proceso *tabla, int tamano) {
         }
     }
 }
-
+// NO PODEMOS USAR SPRINTF
+/*
 void mostrar_detalles() {
     char *memoria_video = (char *)0xB8000;
     int offset = 0;
@@ -44,9 +45,40 @@ void mostrar_detalles() {
             estado_actual, tabla_procesos[i].tiempo_restante);
     }
 }
+*/
+
+void mostrar_detalles() {
+    char *memoria_video = (char *)0xB8000;
+    int offset = 160;
+
+    for (int i = 0; i < MAX_PROCESOS; i++) {
+        memoria_video[offset++] = 'P';
+        memoria_video[offset++] = 0x0F;
+        memoria_video[offset++] = '0' + tabla_procesos[i].id;
+        memoria_video[offset++] = 0x0F;
+
+        memoria_video[offset++] = ' ';
+        memoria_video[offset++] = 0x0F;
+        for (int j = 0; tabla_procesos[i].estado[j] != '\0'; j++) {
+            memoria_video[offset++] = tabla_procesos[i].estado[j];
+            memoria_video[offset++] = 0x0F;
+        }
+
+        memoria_video[offset++] = ' ';
+        memoria_video[offset++] = 0x0F;
+        memoria_video[offset++] = 'T';
+        memoria_video[offset++] = 0x0F;
+        memoria_video[offset++] = ':';
+        memoria_video[offset++] = 0x0F;
+        memoria_video[offset++] = '0' + tabla_procesos[i].tiempo_restante;
+        memoria_video[offset++] = 0x0F;
+        
+        offset = (offset / 160 + 1) * 160;
+    }
+}
 
 void pausa_ejecucion() {
-    for (int t = 0; t < 1000000; t++) asm("nop"); 
+    for (int t = 0; t < 1000000; t++) asm("nop");
 }
 
 void planificador() {
@@ -58,18 +90,18 @@ void planificador() {
 
         for (int i = 0; i < MAX_PROCESOS; i++) {
             if (tabla_procesos[i].tiempo_restante > 0) {
-	 	//Todavia tenemos procesos
-                todos_terminados = false; 
+                todos_terminados = false;
 
-                // simulacion
+                
                 __builtin_memcpy(tabla_procesos[i].estado, "ejecutando", 11);
                 int tiempo_ejecutado = (tabla_procesos[i].tiempo_restante > QUANTUM) ? QUANTUM : tabla_procesos[i].tiempo_restante;
                 tabla_procesos[i].tiempo_restante -= tiempo_ejecutado;
 
-                // simu tiempo de ejecucion (retardo)
-                for (int t = 0; t < 1000000; t++); 
+                
+                mostrar_detalles();
 
-                // actualizacion dele stado actual
+                pausa_ejecucion();
+
                 if (tabla_procesos[i].tiempo_restante == 0) {
                     __builtin_memcpy(tabla_procesos[i].estado, "terminado", 9);
                 } else {
