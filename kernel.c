@@ -47,70 +47,74 @@ void mostrar_detalles() {
 }
 */
 
-void mostrar_detalles() {
+void mostrar_detalles(int fila_actual, int id, const char *estado, int tiempo_restante) {
     char *memoria_video = (char *)0xB8000;
-    int offset = 160;
+    int offset = fila_actual * 160; l
 
-    for (int i = 0; i < MAX_PROCESOS; i++) {
-        memoria_video[offset++] = 'P';
-        memoria_video[offset++] = 0x0F;
-        memoria_video[offset++] = '0' + tabla_procesos[i].id;
-        memoria_video[offset++] = 0x0F;
+    memoria_video[offset++] = 'P';
+    memoria_video[offset++] = 0x0F;
+    memoria_video[offset++] = '0' + id;
+    memoria_video[offset++] = 0x0F;
 
-        memoria_video[offset++] = ' ';
+    memoria_video[offset++] = ' ';
+    memoria_video[offset++] = 0x0F;
+    for (int i = 0; estado[i] != '\0'; i++) {
+        memoria_video[offset++] = estado[i];
         memoria_video[offset++] = 0x0F;
-        for (int j = 0; tabla_procesos[i].estado[j] != '\0'; j++) {
-            memoria_video[offset++] = tabla_procesos[i].estado[j];
-            memoria_video[offset++] = 0x0F;
-        }
-
-        memoria_video[offset++] = ' ';
-        memoria_video[offset++] = 0x0F;
-        memoria_video[offset++] = 'T';
-        memoria_video[offset++] = 0x0F;
-        memoria_video[offset++] = ':';
-        memoria_video[offset++] = 0x0F;
-        memoria_video[offset++] = '0' + tabla_procesos[i].tiempo_restante;
-        memoria_video[offset++] = 0x0F;
-        
-        offset = (offset / 160 + 1) * 160;
     }
+
+    memoria_video[offset++] = ' ';
+    memoria_video[offset++] = 0x0F;
+    memoria_video[offset++] = 'T';
+    memoria_video[offset++] = 0x0F;
+    memoria_video[offset++] = ':';
+    memoria_video[offset++] = 0x0F;
+    memoria_video[offset++] = '0' + tiempo_restante;
+    memoria_video[offset++] = 0x0F;
 }
 
-void pausa_ejecucion() {
-    for (int t = 0; t < 1000000; t++) asm("nop");
+        
+
+void pausa_simulada(int tiempo) {
+    for (int i = 0; i < tiempo; i++) {
+        for (volatile int j = 0; j < 100000; j++) {
+            __asm__ __volatile__("nop");
+        }
+    }
 }
 
 void planificador() {
     ordenar_por_prioridad(tabla_procesos, MAX_PROCESOS); 
     bool todos_terminados = false;
+    int fila_actual = 1; // Comenzamos en la segunda línea (fila 1)
 
     while (!todos_terminados) {
         todos_terminados = true;
 
-        for (int i = 0; i < MAX_PROCESOS; i++) {
+        for (int i = 0; i < MAX_PROCESOS; i++){
             if (tabla_procesos[i].tiempo_restante > 0) {
                 todos_terminados = false;
 
-                
-                __builtin_memcpy(tabla_procesos[i].estado, "ejecutando", 11);
+                __builtin_memcpy(tabla_procesos[i].estado, "Ejecutando", 11);
+                mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
+
                 int tiempo_ejecutado = (tabla_procesos[i].tiempo_restante > QUANTUM) ? QUANTUM : tabla_procesos[i].tiempo_restante;
                 tabla_procesos[i].tiempo_restante -= tiempo_ejecutado;
 
-                
-                mostrar_detalles();
-
-                pausa_ejecucion();
+                pausa_simulada(5000);
 
                 if (tabla_procesos[i].tiempo_restante == 0) {
-                    __builtin_memcpy(tabla_procesos[i].estado, "terminado", 9);
+                    __builtin_memcpy(tabla_procesos[i].estado, "Terminado ", 11);
+                    mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, 0);
                 } else {
-                    __builtin_memcpy(tabla_procesos[i].estado, "listo", 5);
+                    __builtin_memcpy(tabla_procesos[i].estado, "Listo     ", 11);
+                    mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
                 }
             }
         }
     }
 }
+
 
 void kernel_main(void) {
    
