@@ -45,6 +45,10 @@ void mostrar_detalles() {
     }
 }
 
+void pausa_ejecucion() {
+    for (int t = 0; t < 1000000; t++) asm("nop"); 
+}
+
 void planificador() {
     ordenar_por_prioridad(tabla_procesos, MAX_PROCESOS); 
     bool todos_terminados = false;
