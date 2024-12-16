@@ -144,9 +144,9 @@ void mostrar_mensaje(const char *mensaje) {
 
 
 void kernel_main(void) {
-    planificador();
-    //inicializar_archivos();
-    //simular_archivos();
+    //planificador();
+    inicializar_archivos(); //Descomentar para funcionar la simulación de archivos
+    simular_archivos();     // Descomentar para simular los archivos
     char *memoria_video = (char *)0xB8000;
     const char *mensaje = "Simulacion terminada";
     for (int i = 0; mensaje[i] != '\0'; i++) {
