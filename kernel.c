@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <memoria.h> // Para la memoria
+#include "memoria.h" // Para la memoria
 
 #define MAX_PROCESOS 3
 #define QUANTUM 2
@@ -50,7 +50,7 @@ void mostrar_detalles() {
 
 void mostrar_detalles(int fila_actual, int id, const char *estado, int tiempo_restante) {
     char *memoria_video = (char *)0xB8000;
-    int offset = fila_actual * 160; l
+    int offset = fila_actual * 160;
 
     memoria_video[offset++] = 'P';
     memoria_video[offset++] = 0x0F;
@@ -83,8 +83,66 @@ void pausa_simulada(int tiempo) {
         }
     }
 }
+// Función strcmp: compara dos cadenas
+int strcmp(const char *str1, const char *str2) {
+    while (*str1 && *str2 && *str1 == *str2) {
+        str1++;
+        str2++;
+    }
+    return *str1 - *str2;
+}
+
+/*void planificador() {
+    inicializar_memoria(); // Inicializa la memoria simulada
+    ordenar_por_prioridad(tabla_procesos, MAX_PROCESOS);
+    bool todos_terminados = false;
+    int fila_actual = 1; // Comenzamos en la segunda línea
+
+    while (!todos_terminados) {
+        todos_terminados = true;
+
+        for (int i = 0; i < MAX_PROCESOS; i++) {
+            if (tabla_procesos[i].tiempo_restante > 0) {
+                todos_terminados = false;
+
+                // Asignar memoria cuando el proceso comienza a ejecutarse
+                if (strcmp(tabla_procesos[i].estado, "Listo") == 0) {
+                    asignar_memoria(tabla_procesos[i].id);
+                }
+
+                // Cambiar estado a Ejecutando
+                __builtin_memcpy(tabla_procesos[i].estado, "Ejecutando", 11);
+                mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
+
+                // Mostrar mapa de memoria
+                mostrar_memoria();
+                pausa_simulada(3);
+
+                // Reducir tiempo restante
+                int tiempo_ejecutado = (tabla_procesos[i].tiempo_restante > QUANTUM) ? QUANTUM : tabla_procesos[i].tiempo_restante;
+                tabla_procesos[i].tiempo_restante -= tiempo_ejecutado;
+
+                // Actualizar estado
+                if (tabla_procesos[i].tiempo_restante == 0) {
+                    __builtin_memcpy(tabla_procesos[i].estado, "Terminado", 11);
+                    liberar_memoria(tabla_procesos[i].id);
+                } else {
+                    __builtin_memcpy(tabla_procesos[i].estado, "Listo", 11);
+                }
+
+                // Mostrar estado actualizado y memoria
+                mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
+                mostrar_memoria();
+                pausa_simulada(3);
+            }
+        }
+    }
+}
+*/
 
 void planificador() {
+    inicializar_memoria();
+    mostrar_memoria();
     ordenar_por_prioridad(tabla_procesos, MAX_PROCESOS); 
     bool todos_terminados = false;
     int fila_actual = 1; // Comenzamos en la segunda línea (fila 1)
@@ -95,22 +153,33 @@ void planificador() {
         for (int i = 0; i < MAX_PROCESOS; i++){
             if (tabla_procesos[i].tiempo_restante > 0) {
                 todos_terminados = false;
-
+		if (strcmp(tabla_procesos[i].estado, "Listo     ") == 0) {
+                    asignar_memoria(tabla_procesos[i].id);
+		    mostrar_memoria();
+                }
+		mostrar_memoria();
                 __builtin_memcpy(tabla_procesos[i].estado, "Ejecutando", 11);
                 mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
-
+		asignar_memoria(tabla_procesos[i].id); // 
+		mostrar_memoria(); //
                 int tiempo_ejecutado = (tabla_procesos[i].tiempo_restante > QUANTUM) ? QUANTUM : tabla_procesos[i].tiempo_restante;
                 tabla_procesos[i].tiempo_restante -= tiempo_ejecutado;
-
-                pausa_simulada(5000);
+                
+		pausa_simulada(80000);
 
                 if (tabla_procesos[i].tiempo_restante == 0) {
                     __builtin_memcpy(tabla_procesos[i].estado, "Terminado ", 11);
-                    mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, 0);
+		    mostrar_memoria();
+		    liberar_memoria(tabla_procesos[i].id);
+		    mostrar_memoria();
                 } else {
                     __builtin_memcpy(tabla_procesos[i].estado, "Listo     ", 11);
-                    mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
+		    asignar_memoria(tabla_procesos[i].id);
+		    mostrar_memoria();
                 }
+
+		mostrar_detalles(fila_actual++, tabla_procesos[i].id, tabla_procesos[i].estado, tabla_procesos[i].tiempo_restante);
+		mostrar_memoria();
             }
         }
     }

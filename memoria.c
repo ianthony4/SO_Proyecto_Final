@@ -29,12 +29,22 @@ void liberar_memoria(int id) {
         if (memoria[i] == '0' + id) memoria[i] = '-';
     }
 }
-
 void mostrar_memoria() {
     char *memoria_video = (char *)0xB8000;
-    int offset = 20 * 160;
+    int offset = 18 * 160; // Línea 18 de la pantalla
+
+    // Mostrar el encabezado
+    const char *encabezado = "Memoria: ";
+    for (int i = 0; encabezado[i] != '\0'; i++) {
+        memoria_video[offset++] = encabezado[i];
+        memoria_video[offset++] = 0x0F; // Color blanco sobre negro
+    }
+
+    // Mostrar el estado de la memoria
     for (int i = 0; i < TAM_MEMORIA; i++) {
-        memoria_video[offset++] = memoria[i];
+        memoria_video[offset++] = memoria[i]; // 'X' o '-'
+        memoria_video[offset++] = 0x0F;       // Color blanco sobre negro
+        memoria_video[offset++] = ' ';        // Espacio entre bloques
         memoria_video[offset++] = 0x0F;
     }
 }
