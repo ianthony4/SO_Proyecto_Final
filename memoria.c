@@ -3,6 +3,7 @@
 #define TAM_MEMORIA 32
 #define BLOQUES_POR_PROCESO 2
 
+
 char memoria[TAM_MEMORIA];
 
 void inicializar_memoria() {
@@ -48,4 +49,3 @@ void mostrar_memoria() {
         memoria_video[offset++] = 0x0F;
     }
 }
-

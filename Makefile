@@ -15,8 +15,12 @@ kernel.o: kernel.c
 
 memoria.o: memoria.c
 	$(CC) $(CFLAGS) -c memoria.c -o memoria.o
-gamaOS.bin: boot.o kernel.o memoria.o
-	$(LD) $(LDFLAGS) boot.o kernel.o memoria.o -o gamaOS.bin -lgcc
+
+dispositivo.o: dispositivo.c
+	$(CC) $(CFLAGS) -c dispositivo.c -o dispositivo.o
+
+gamaOS.bin: boot.o kernel.o memoria.o dispositivo.o
+	$(LD) $(LDFLAGS) boot.o kernel.o memoria.o dispositivo.o -o gamaOS.bin -lgcc
 
 gamaOS.iso: gamaOS.bin
 	mkdir -p isodir/boot/grub
