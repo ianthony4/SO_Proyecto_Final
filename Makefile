@@ -5,29 +5,38 @@ GRUB = grub-mkrescue
 CFLAGS = -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -T linker.ld -nostdlib
 
-all: gamaOS.iso
+SRC = src
+INCLUDE = include
+BUILD = build
 
-boot.o: boot.s
-	$(AS) boot.s -o boot.o
+OBJS = $(BUILD)/boot.o $(BUILD)/kernel.o $(BUILD)/memoria.o $(BUILD)/dispositivo.o $(BUILD)/archivo.o
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
+all: $(BUILD)/gamaOS.iso
 
-memoria.o: memoria.c
-	$(CC) $(CFLAGS) -c memoria.c -o memoria.o
+$(BUILD)/boot.o: $(SRC)/boot.s
+	$(AS) $(SRC)/boot.s -o $(BUILD)/boot.o
 
-dispositivo.o: dispositivo.c
-	$(CC) $(CFLAGS) -c dispositivo.c -o dispositivo.o
+$(BUILD)/kernel.o: $(SRC)/kernel.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/kernel.c -o $(BUILD)/kernel.o
 
-gamaOS.bin: boot.o kernel.o memoria.o dispositivo.o
-	$(LD) $(LDFLAGS) boot.o kernel.o memoria.o dispositivo.o -o gamaOS.bin -lgcc
+$(BUILD)/memoria.o: $(SRC)/memoria.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/memoria.c -o $(BUILD)/memoria.o
 
-gamaOS.iso: gamaOS.bin
+$(BUILD)/dispositivo.o: $(SRC)/dispositivo.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/dispositivo.c -o $(BUILD)/dispositivo.o
+
+$(BUILD)/archivo.o: $(SRC)/archivo.c
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/archivo.c -o $(BUILD)/archivo.o
+
+$(BUILD)/gamaOS.bin: $(OBJS)
+	$(LD) $(LDFLAGS) $(OBJS) -o $(BUILD)/gamaOS.bin -lgcc
+
+$(BUILD)/gamaOS.iso: $(BUILD)/gamaOS.bin
 	mkdir -p isodir/boot/grub
-	cp gamaOS.bin isodir/boot/gamaOS.bin
+	cp $(BUILD)/gamaOS.bin isodir/boot/gamaOS.bin
 	cp grub.cfg isodir/boot/grub/grub.cfg
-	$(GRUB) -o gamaOS.iso isodir
+	$(GRUB) -o $(BUILD)/gamaOS.iso isodir
 
 clean:
-	rm -rf *.o gamaOS.bin gamaOS.iso isodir
+	rm -rf $(BUILD)/*.o $(BUILD)/*.bin $(BUILD)/*.iso isodir
 
