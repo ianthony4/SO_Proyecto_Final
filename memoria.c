@@ -1,7 +1,7 @@
 #include "memoria.h"
 
 #define TAM_MEMORIA 32
-#define BLOQUES_POR_PROCESO 4
+#define BLOQUES_POR_PROCESO 2
 
 char memoria[TAM_MEMORIA];
 
