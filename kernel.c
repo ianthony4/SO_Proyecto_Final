@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <memoria.h> // Para la memoria
 
 #define MAX_PROCESOS 3
 #define QUANTUM 2
@@ -117,7 +118,7 @@ void planificador() {
 
 
 void kernel_main(void) {
-   
+    inicializar_memoria();
     planificador();
 
     // resultados
